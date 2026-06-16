@@ -3,3 +3,5 @@
 .idea/
 outputs/midi/*.wav
 outputs/midi/*.mp3
+data/nottingham-source/
+data/raw/
