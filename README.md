@@ -8,14 +8,13 @@
 
 | Nama | NIM | Kontribusi |
 |------|-----|------------|
-| [Nama 1] | [NIM 1] | Preprocessing & Evaluasi |
-| [Nama 2] | [NIM 2] | Arsitektur Model & Training |
-| [Nama 3] | [NIM 3] | Interface & Dokumentasi |
+| Muhammad Arifbillah Kamil | 1203230028 | Preprocessing & Evaluasi |
+| M Iqbal Ilham Prabowo | 1203230088 | Arsitektur Model & Training |
+| Jehova Putra Yan Nehru | 1203230107 | Interface & Dokumentasi |
 
-**Kelas:** [Kelas]  
+**Kelas:** IF-03-01  
 **Mata Kuliah:** Generative AI  
-**Link Repository:** [https://github.com/username/GeMelan](https://github.com/username/GeMelan)  
-**Link Demo:** [akan diisi setelah deploy]  
+**Link Repository:** [https://github.com/username/GeMelan](https://github.com/ArifbillahKamil/GeMelan)  
 
 ---
 
