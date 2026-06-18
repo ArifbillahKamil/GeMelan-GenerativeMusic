@@ -1,0 +1,9 @@
+{
+  "vocab_size": 256,
+  "special_tokens": {
+    "PAD": 0,
+    "SOS": 1,
+    "EOS": 2
+  },
+  "num_note_tokens": 253
+}
