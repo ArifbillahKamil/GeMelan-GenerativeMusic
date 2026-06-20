@@ -13,11 +13,7 @@ from src.inference.generate import (
     load_model, load_vocab, generate_sequence,
     tokens_to_midi, save_piano_roll
 )
-
-# ---------------------------------------------------------------------------
 # KONFIGURASI PATH
-# ---------------------------------------------------------------------------
-
 MODEL_PATH = os.path.join(os.path.dirname(__file__), '..', 'models', 'best_model.pt')
 VOCAB_PATH  = os.path.join(os.path.dirname(__file__), '..', 'data', 'processed', 'vocab.pkl')
 OUTPUT_DIR  = os.path.join(os.path.dirname(__file__), '..', 'outputs', 'midi')
@@ -26,10 +22,7 @@ PLOTS_DIR   = os.path.join(os.path.dirname(__file__), '..', 'outputs', 'plots')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 os.makedirs(PLOTS_DIR,  exist_ok=True)
 
-# ---------------------------------------------------------------------------
 # LOAD MODEL & VOCAB SAAT STARTUP
-# ---------------------------------------------------------------------------
-
 print("=" * 55)
 print("  GeMelan - Loading model...")
 print("=" * 55)
@@ -64,7 +57,6 @@ def load_resources():
 MODEL_LOADED = load_resources()
 
 # FUNGSI GENERATE (dipanggil oleh Gradio)
-
 def generate_melody(
     length:      int,
     temperature: float,
@@ -174,7 +166,6 @@ def generate_melody(
 
 
 # GRADIO INTERFACE
-
 def build_interface() -> gr.Blocks:
     """Membangun tampilan Gradio."""
 
@@ -254,7 +245,6 @@ def build_interface() -> gr.Blocks:
                 )
 
         # Contoh preset
-
         gr.Markdown("### 🎛️ Preset Cepat")
         with gr.Row():
             gr.Examples(
@@ -285,7 +275,6 @@ def build_interface() -> gr.Blocks:
     return demo
 
 # ENTRY POINT
-
 if __name__ == '__main__':
     demo = build_interface()
     demo.launch(
