@@ -32,9 +32,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 from src.model.lstm import MelodyLSTM
 
 
-# ---------------------------------------------------------------------------
+
 # 1. LOAD MODEL & VOCAB
-# ---------------------------------------------------------------------------
+
 
 def load_model(checkpoint_path: str, device: torch.device) -> tuple:
     """
@@ -77,9 +77,9 @@ def load_vocab(vocab_path: str) -> dict:
     return vocab
 
 
-# ---------------------------------------------------------------------------
+
 # 2. SAMPLING STRATEGY
-# ---------------------------------------------------------------------------
+
 
 def temperature_sampling(logits: torch.Tensor, temperature: float = 1.0) -> int:
     """
@@ -131,9 +131,9 @@ def topk_sampling(logits: torch.Tensor, temperature: float = 1.0, k: int = 10) -
     return top_k_indices[sampled].item()
 
 
-# ---------------------------------------------------------------------------
+
 # 3. GENERATION LOOP
-# ---------------------------------------------------------------------------
+
 
 def generate_sequence(
     model:       MelodyLSTM,
