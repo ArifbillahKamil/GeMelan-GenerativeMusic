@@ -1,6 +1,6 @@
-# 🎵 GeMelan — Indonesian Traditional Melody Generator
+# 🎵 GeMelan — Folk Melody Generator
 
-> Aplikasi Generative AI yang menghasilkan melodi musik tradisional Indonesia secara otomatis menggunakan model LSTM yang dibangun dari scratch dengan PyTorch.
+> Aplikasi Generative AI yang menghasilkan melodi musik folk secara otomatis menggunakan model LSTM yang dibangun dari scratch dengan PyTorch.
 
 ---
 
@@ -8,29 +8,30 @@
 
 | Nama | NIM | Kontribusi |
 |------|-----|------------|
-| Muhammad Arifbillah Kamil | 1203230028 | Preprocessing & Evaluasi |
+| Muhammad Arifbillah Kamil | 1203230028 | Data & Preprocessing |
 | M Iqbal Ilham Prabowo | 1203230088 | Arsitektur Model & Training |
-| Jehova Putra Yan Nehru | 1203230107 | Interface & Dokumentasi |
+| Jehova Putra Yan Nehru | 1203230107 | Inference, Evaluasi & Interface |
 
-**Kelas:** IF-03-01  
-**Mata Kuliah:** Generative AI  
-**Link Repository:** [https://github.com/username/GeMelan](https://github.com/ArifbillahKamil/GeMelan)  
+**Kelas:** IF-03-01
+**Mata Kuliah:** Generative AI
+**Link Repository:** [https://github.com/ArifbillahKamil/GeMelan](https://github.com/ArifbillahKamil/GeMelan)
+**Link Demo:** [akan diisi setelah deploy]
 
 ---
 
 ## 📌 Deskripsi Proyek
 
-**GeMelan** adalah sistem generatif berbasis **LSTM (Long Short-Term Memory)** yang dibangun dari scratch menggunakan PyTorch. Model belajar pola melodi dari dataset MIDI musik tradisional Indonesia, kemudian menghasilkan melodi baru yang orisinal dalam format `.mid` yang dapat diputar dan didownload.
+**GeMelan** (Generative Melody) adalah sistem generatif berbasis **LSTM (Long Short-Term Memory)** yang dibangun dari scratch menggunakan PyTorch. Model belajar pola melodi dari **Nottingham Music Database** — koleksi 1.034 lagu folk dalam format MIDI — kemudian menghasilkan melodi baru yang orisinal dalam format `.mid` yang dapat diputar dan didownload.
 
 ### Fitur Utama
 - 🎼 Generate melodi baru dari seed note atau secara acak
-- 🎛️ Kontrol parameter: panjang melodi & temperature (kreativitas)
+- 🎛️ Kontrol parameter: panjang melodi, temperature, top-k, dan tempo
 - 💾 Download hasil generate dalam format MIDI (`.mid`)
 - 📊 Visualisasi piano roll dari melodi yang dihasilkan
 - 🖥️ Antarmuka web interaktif berbasis Gradio
 
-> ✅ **Tidak menggunakan provider LLM/API tertutup** (OpenAI, Anthropic, Google Gemini, dsb.)  
-> Model dibangun sepenuhnya dari scratch menggunakan PyTorch tanpa bergantung pada layanan eksternal berbayar.
+> ✅ **Tidak menggunakan provider LLM/API tertutup** (OpenAI, Anthropic, Google Gemini, dsb.)
+> Model dibangun sepenuhnya dari scratch menggunakan PyTorch tanpa bergantung pada layanan eksternal.
 
 ---
 
@@ -38,28 +39,37 @@
 
 ```
 GeMelan/
-├── data/                   # Dataset MIDI (lihat instruksi unduh di bawah)
+├── data/
+│   ├── nottingham-source/      # Dataset Nottingham (hasil clone)
+│   │   └── MIDI/
+│   │       └── melody/         # 1.034 file MIDI melody (yang digunakan)
+│   └── processed/              # Hasil preprocessing (otomatis dibuat)
+│       ├── train.npz           # Data training (80%)
+│       ├── val.npz             # Data validasi (10%)
+│       ├── test.npz            # Data testing (10%)
+│       ├── vocab.pkl           # Vocabulary token
+│       └── vocab_meta.json     # Metadata vocabulary
 ├── src/
-│   ├── model/              # Arsitektur LSTM & training loop
-│   │   ├── lstm.py         # Definisi model LSTM
-│   │   └── train.py        # Script training
-│   ├── preprocessing/      # Parsing & tokenisasi MIDI
-│   │   ├── midi_parser.py  # Parser file MIDI ke sequence note
-│   │   └── tokenizer.py    # Konversi note ke token integer
-│   ├── evaluation/         # Metrik evaluasi
-│   │   └── metrics.py      # Perplexity, diversity, repetition score
-│   └── inference/          # Generate melodi baru
-│       └── generate.py     # Script inference & sampling
-├── notebooks/              # Eksplorasi & eksperimen Jupyter
-├── models/                 # Checkpoint model hasil training
+│   ├── model/
+│   │   ├── lstm.py             # Arsitektur MelodyLSTM
+│   │   └── train.py            # Training loop
+│   ├── preprocessing/
+│   │   └── midi_parser.py      # Parser, tokenizer, windowing, split
+│   ├── evaluation/
+│   │   └── metrics.py          # Perplexity, diversity, repetition, KL divergence
+│   └── inference/
+│       └── generate.py         # Temperature & top-k sampling, output MIDI
+├── notebooks/                  # Eksplorasi & eksperimen Jupyter
+├── models/                     # Checkpoint model hasil training
+│   └── best_model.pt           # Model terbaik (berdasarkan val loss)
 ├── outputs/
-│   ├── midi/               # Hasil generate melodi (.mid)
-│   ├── plots/              # Grafik loss, distribusi pitch
-│   └── logs/               # Log training
+│   ├── midi/                   # Hasil generate melodi (.mid)
+│   ├── plots/                  # Piano roll, training curve, pitch distribution
+│   └── logs/                   # Log training JSON, evaluation report
 ├── app/
-│   └── app.py              # Gradio interface
-├── requirements.txt        # Daftar dependencies
-├── .env.example            # Contoh environment variable
+│   └── app.py                  # Gradio interface
+├── requirements.txt
+├── .env.example
 └── README.md
 ```
 
@@ -75,7 +85,7 @@ GeMelan/
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/[username]/GeMelan.git
+git clone https://github.com/ArifbillahKamil/GeMelan.git
 cd GeMelan
 
 # 2. Buat virtual environment
@@ -98,103 +108,119 @@ cp .env.example .env
 
 ## 📥 Dataset
 
-Dataset yang digunakan adalah kumpulan file MIDI musik tradisional Indonesia.
+Dataset yang digunakan adalah **Nottingham Music Database** — koleksi lagu folk Inggris dan Amerika yang merupakan benchmark standar untuk penelitian music generation.
 
 | Info | Detail |
 |------|--------|
-| **Sumber** | [akan diisi setelah dataset fix] |
-| **Lisensi** | [akan diisi] |
-| **Jumlah file** | [akan diisi] |
-| **Format** | `.mid` / `.midi` |
+| **Nama** | Nottingham Music Database |
+| **Sumber** | https://github.com/jukedeck/nottingham-dataset |
+| **Lisensi** | Public Domain |
+| **Jumlah file** | 1.034 file MIDI melody |
+| **Genre** | Folk (jigs, reels, waltzes, hornpipes, dll.) |
+| **Format** | `.mid` |
 
-### Cara Menyiapkan Dataset
-
-```bash
-# Unduh dataset dari link di atas, lalu letakkan di folder data/
-# Struktur yang diharapkan:
-data/
-└── raw/
-    ├── lagu1.mid
-    ├── lagu2.mid
-    └── ...
-```
+Dataset sudah tersedia di folder `data/nottingham-source/` dalam repository ini.
 
 ---
 
-## 🏋️ Training Model
+## 🔄 Urutan Penggunaan
+
+### 1. Preprocessing Data
 
 ```bash
-# Jalankan preprocessing terlebih dahulu
-python src/preprocessing/midi_parser.py --data_dir data/raw --output_dir data/processed
+python src/preprocessing/midi_parser.py --input_dir data/nottingham-source/MIDI/melody --output_dir data/processed
+```
 
-# Mulai training
+**Output:** `data/processed/` berisi `train.npz`, `val.npz`, `test.npz`, `vocab.pkl`
+
+### 2. Training Model
+
+```bash
+# Windows
+python src/model/train.py --data_dir data/processed --epochs 100 --batch_size 64
+
+# Linux/Mac
 python src/model/train.py \
-  --data_dir data/processed \
-  --epochs 100 \
-  --batch_size 32 \
-  --lr 0.001 \
-  --hidden_size 256 \
-  --num_layers 2 \
-  --seed 42 \
-  --checkpoint_dir models/
+    --data_dir data/processed \
+    --epochs 100 \
+    --batch_size 64 \
+    --hidden_size 256 \
+    --num_layers 2 \
+    --lr 0.001 \
+    --seed 42
 ```
 
-### Parameter Training
+**Output:** `models/best_model.pt` + `outputs/logs/training_log.json`
 
-| Parameter | Default | Keterangan |
-|-----------|---------|------------|
-| `--epochs` | 100 | Jumlah epoch training |
-| `--batch_size` | 32 | Ukuran batch |
-| `--lr` | 0.001 | Learning rate |
-| `--hidden_size` | 256 | Ukuran hidden state LSTM |
-| `--num_layers` | 2 | Jumlah layer LSTM |
-| `--seed` | 42 | Random seed untuk reproducibility |
-
----
-
-## 🎼 Generate Melodi (Inference)
+### 3. Generate Melodi
 
 ```bash
-# Generate melodi baru dengan parameter default
-python src/inference/generate.py \
-  --model_path models/best_model.pt \
-  --length 200 \
-  --temperature 0.8 \
-  --output outputs/midi/result.mid
+# Windows
+python src/inference/generate.py --model_path models/best_model.pt --length 200 --temperature 0.8
 
-# Generate dengan seed note tertentu (pitch MIDI 0-127)
+# Linux/Mac — dengan seed note (C4=60, E4=64, G4=67)
 python src/inference/generate.py \
-  --model_path models/best_model.pt \
-  --seed_notes 60 64 67 \
-  --length 200 \
-  --temperature 0.8 \
-  --output outputs/midi/result.mid
+    --model_path models/best_model.pt \
+    --seed_notes 60 64 67 \
+    --length 200 \
+    --temperature 0.8
 ```
 
-### Parameter Generation
+**Output:** `outputs/midi/generated.mid` + piano roll di `outputs/plots/`
 
-| Parameter | Default | Keterangan |
-|-----------|---------|------------|
-| `--length` | 200 | Panjang melodi (jumlah note) |
-| `--temperature` | 0.8 | Kreativitas (0.1=konservatif, 1.5=kreatif) |
-| `--seed_notes` | random | Note awal sebagai pemicu generate |
+### 4. Evaluasi
 
----
+```bash
+python src/evaluation/metrics.py --midi_path outputs/midi/generated.mid --log_path outputs/logs/training_log.json --dataset_dir data/nottingham-source/MIDI/melody
+```
 
-## 🖥️ Menjalankan Aplikasi
+**Output:** `outputs/logs/evaluation_report.json` + grafik di `outputs/plots/`
+
+### 5. Jalankan Aplikasi
 
 ```bash
 python app/app.py
 ```
 
-Buka browser dan akses: **http://localhost:7860**
+Buka browser: **http://localhost:7860**
 
-### Cara Penggunaan Aplikasi
-1. Atur panjang melodi yang diinginkan menggunakan slider
-2. Atur nilai temperature (semakin tinggi = semakin kreatif/acak)
-3. Isi seed note secara manual atau biarkan kosong untuk generate acak
-4. Klik tombol **"Generate Melodi"**
-5. Dengarkan preview melodi dan download file `.mid`
+---
+
+## 🏋️ Parameter Training
+
+| Parameter | Default | Keterangan |
+|-----------|---------|------------|
+| `--epochs` | 100 | Jumlah epoch training |
+| `--batch_size` | 64 | Ukuran batch |
+| `--lr` | 0.001 | Learning rate |
+| `--hidden_size` | 256 | Ukuran hidden state LSTM |
+| `--num_layers` | 2 | Jumlah layer LSTM |
+| `--dropout` | 0.3 | Dropout probability |
+| `--patience` | 10 | Early stopping patience |
+| `--seed` | 42 | Random seed untuk reproducibility |
+
+---
+
+## 🎼 Parameter Generation
+
+| Parameter | Default | Keterangan |
+|-----------|---------|------------|
+| `--length` | 200 | Panjang melodi (jumlah note) |
+| `--temperature` | 0.8 | Kreativitas (0.1=konservatif, 2.0=kreatif) |
+| `--top_k` | 10 | Jumlah kandidat note teratas |
+| `--seed_notes` | random | Pitch MIDI awal (contoh: 60 64 67) |
+| `--tempo` | 120 | Tempo dalam BPM |
+
+---
+
+## 🖥️ Cara Penggunaan Aplikasi
+
+1. Jalankan `python app/app.py` dan buka **http://localhost:7860**
+2. Atur **panjang melodi** menggunakan slider (50–500 note)
+3. Atur **temperature** (rendah=terstruktur, tinggi=kreatif)
+4. Isi **seed pitch** secara manual atau biarkan kosong untuk random
+5. Klik **"Generate Melodi"**
+6. Lihat visualisasi piano roll dan **download file `.mid`**
 
 ---
 
@@ -203,21 +229,25 @@ Buka browser dan akses: **http://localhost:7860**
 Model dievaluasi menggunakan kombinasi metrik kuantitatif dan kualitatif:
 
 ### Metrik Kuantitatif
+
 | Metrik | Keterangan |
 |--------|------------|
 | **Loss (Cross-Entropy)** | Diukur tiap epoch selama training |
-| **Perplexity** | Mengukur seberapa "yakin" model memprediksi note berikutnya |
-| **Pitch Diversity Score** | Jumlah unique pitch dalam output generate |
-| **Repetition Score** | Seberapa sering pola note berulang (n-gram repetition) |
+| **Perplexity** | Seberapa "yakin" model memprediksi note berikutnya |
+| **Pitch Diversity Score** | Unique pitch / possible pitch range (0–1) |
+| **Repetition Score** | N-gram repetition ratio (0=tidak repetitif) |
+| **KL Divergence** | Jarak distribusi pitch generated vs dataset |
 
 ### Evaluasi Kualitatif (Human Evaluation)
-Melodi hasil generate dinilai oleh pendengar menggunakan rubrik skala 1–5:
+
+Melodi dinilai oleh pendengar menggunakan rubrik skala 1–5:
+
 | Kriteria | Deskripsi |
 |----------|-----------|
 | **Koherensi** | Apakah melodi terdengar masuk akal dan tidak random? |
 | **Musikalitas** | Apakah ada pola ritmis yang dapat dirasakan? |
-| **Keragaman** | Apakah tiap generate menghasilkan melodi yang berbeda? |
-| **Kemiripan Gaya** | Apakah terasa seperti musik tradisional Indonesia? |
+| **Keragaman** | Apakah tiap generate menghasilkan melodi berbeda? |
+| **Kemiripan Gaya** | Apakah terasa seperti musik folk? |
 
 ---
 
@@ -225,7 +255,8 @@ Melodi hasil generate dinilai oleh pendengar menggunakan rubrik skala 1–5:
 
 | Item | Link |
 |------|------|
-| 📁 Dataset | [akan diisi] |
+| 📁 Repository | https://github.com/ArifbillahKamil/GeMelan |
+| 📦 Dataset | https://github.com/jukedeck/nottingham-dataset |
 | 💾 Model Checkpoint | [akan diisi] |
 | 🚀 Demo Aplikasi | [akan diisi] |
 | 📄 Laporan | [akan diisi] |
@@ -235,5 +266,6 @@ Melodi hasil generate dinilai oleh pendengar menggunakan rubrik skala 1–5:
 ## 📋 Catatan
 
 - Model dijalankan secara lokal tanpa bergantung pada internet atau API eksternal
-- Training dapat dilakukan di CPU, namun GPU akan mempercepat proses secara signifikan
-- Keterbatasan resource (CPU-only) didokumentasikan di laporan beserta dampaknya terhadap kualitas output
+- Training dapat dilakukan di CPU maupun GPU — GPU mempercepat proses secara signifikan
+- Keterbatasan resource (CPU-only untuk sebagian anggota) didokumentasikan di laporan
+- Dataset Nottingham Music Database berstatus **Public Domain** — bebas digunakan untuk keperluan akademik
