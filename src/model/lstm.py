@@ -55,7 +55,6 @@ class MelodyLSTM(nn.Module):
                 nn.init.orthogonal_(param.data)
             elif 'bias' in name:
                 nn.init.zeros_(param.data)
-                # Forget gate bias = 1 (teknik umum untuk stabilitas LSTM)
                 hidden_size = param.data.shape[0] // 4
                 param.data[hidden_size:2*hidden_size].fill_(1.0)
 
